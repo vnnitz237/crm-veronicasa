@@ -14,3 +14,10 @@ Registro cronológico de comandos reais do Orca, recibos, medições de memória
 | 13/11 | **C1** iniciado (mesmo comando, worktree `crm-c-fluxos`) | task `task_7183456b6dd8`, dispatch `ctx_73c035166307`, `live` |
 | 13/11 | Conferência única via `worker-read`: ambos trabalhando, sem pedido de permissão pendente | transcrições |
 | 13/11 | B e D aguardam (limite de 2 tarefas pesadas). Worktrees criadas, sem `npm ci` nem pilha ainda | — |
+| 13/11 | **C1 entregue** (`6ec73f2`, worker_done). Revisão: arquivos dentro do escopo; diff ok; ressalva: CSV sem 2 casas (vai no C2) | `docs/reports/c-C1.md` |
+| 13/11 | **Merge C1** → `59cd5ed`. Gates no slot 0: typecheck/lint ok; unit 20/20; db 25/25; e2e 8/8. Verificação funcional no navegador AC-M4-1..5 e AC-M5-1..5: 11/11 PASS; dados restaurados | logs `i1c.log`, script `scratchpad/i1/m4m5.mjs` |
+| 13/11 | Memória: swap 4,2/5 GB. Paradas pilhas ociosas (s3, slot 0). D preparado (slot 4) mas **não lançado** para respeitar o limite de 2 tarefas pesadas | `vm_stat`, `sysctl vm.swapusage` |
+| 13/11 | **A1 entregue** (`8f1f3da` + `f76db5d`, worker_done). Revisão: só arquivos de A; migração aditiva (sem DROP/TRUNCATE/DELETE); RLS ativa nas 4 tabelas novas; views `security_invoker`; definers com `search_path=''`; `anon` revogado | `docs/reports/a-A1.md` |
+| 13/11 | **Merge A1** → `dd17d3c`. Gates no slot 0: typecheck/lint/build ok; unit 20/20; db 42/42; e2e 8/8 | log `i1a.log` |
+| 13/11 | **I1 concluída.** Briefs B2/C2 → `9809189`. Branches B e C avançadas (ff) para a integração; B preparado (slot 2), C religado (slot 3); pilhas s1, s4 e slot 0 paradas | — |
+| 13/11 | **B2** iniciado (worktree `crm-b-frontend`) e **C2** iniciado (`crm-c-fluxos`) | B2: task `task_6c6619f60afe`, dispatch `ctx_1511b70184b1`; C2: task `task_a005588f261b`, dispatch `ctx_ca0f9332cea1`; ambos `ready` |
