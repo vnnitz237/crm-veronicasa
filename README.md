@@ -1,53 +1,30 @@
-# CRM Verônica Sá — MVP consolidado (Etapa 1)
+# CRM Verônica Sá — MVP
 
 Next.js 16 (App Router, Server Actions) + Supabase (PostgreSQL, Auth e RLS).
-**Todos os dados são fictícios.** Ambiente pensado para rodar localmente.
+**Todos os dados são fictícios.** Ambiente pensado para rodar localmente. Não há integração externa.
 
-## Requisitos consolidados
-
-**Vendedor(a)**
-- informações centralizadas por cliente;
-- cadastro de clientes;
-- ações de vendas do mês;
-- por venda: serviço, unidade, data da venda, data de execução do serviço e status *fechou / não fechou*;
-- relatório mensal.
-
-**Gestor(a)**
-- acesso aos dados de todos os vendedores;
-- relatório de vendas;
-- acesso e análise das conversas.
-
-## Situação
+## Requisitos e situação
 
 | Requisito | Situação |
 |---|---|
-| Cadastro de clientes, com telefone canônico e único | ✅ Implementado |
-| Negociações (serviço, unidade, valor, status, data da venda, execução prevista) | ✅ Implementado |
-| "Não fechou" limpa a execução prevista (banco + histórico) | ✅ Implementado |
-| Histórico de alterações com autor e horário | ✅ Implementado |
-| Relatório mensal (vendedor vê o próprio; gestora vê todos, por vendedor) | ✅ Implementado |
-| Isolamento por RLS; gestora lê tudo sem editar | ✅ Implementado |
-| Ações comerciais do mês e próximas ações | ⏳ Etapa 2 |
-| Execução realizada x prevista e relatório de execução | ⏳ Etapa 3 |
-| Conversas (histórico manual) e análise pela gestora | ⏳ Etapa 4 |
-| Integrações externas (WhatsApp, e-mail etc.) | ⏳ Etapa 5, só após decisão |
+| Cadastro, busca e **edição** de clientes, com telefone canônico e único | ✅ |
+| Negociações (serviço, unidade, valor, status, data da venda, execução prevista) e histórico | ✅ |
+| **Execuções** (pendente, realizada ou cancelada) e **relatório de execução** — *provisório H-E* | ✅ |
+| **Ações comerciais** do mês (planejadas, realizadas e canceladas) e próximas ações — *provisório H-A* | ✅ |
+| **Conversas** (registro manual, correção por nova versão) e **análise da gestora** — *provisório H-C* | ✅ |
+| Relatório mensal de vendas e **CSV** (vendas e execução) | ✅ |
+| **Painel gerencial** mínimo da gestora | ✅ |
+| Isolamento por RLS; gestora lê tudo sem editar | ✅ |
+| Integrações externas (WhatsApp, e-mail etc.) | ⏳ Só após decisão da cliente |
 
-## Roteiro de etapas
-
-1. **Etapa 1 — Consolidação do MVP** (esta): base estável, documentação, verificações (typecheck, lint, build, testes) e primeiro commit.
-2. **Etapa 2 — Ações comerciais:** ações de vendas do mês por vendedor e próximas ações por cliente/negociação.
-3. **Etapa 3 — Execução:** data de execução realizada ao lado da prevista e relatório de execução.
-4. **Etapa 4 — Conversas:** registro manual do histórico de conversas e regras de acesso/análise da gestora.
-5. **Etapa 5 — Integrações externas:** avaliar somente depois de decisões explícitas sobre canais, APIs, permissões e custos.
-
-Regras gerais: apenas Supabase local e dados fictícios; nenhum serviço externo nem dado real até decisão em contrário.
+Documentação técnica em `docs/`: estado atual, especificação, plano, critérios de aceite, relatórios dos agentes e QA.
 
 ## Pré-requisitos
 
 - Node 24+ e npm
 - Docker em execução (o Supabase local roda em containers)
 
-O Supabase CLI vem como dependência do projeto (`npx supabase`), não é preciso instalá-lo globalmente.
+O Supabase CLI vem como dependência do projeto. Use sempre os scripts npm, que passam pelo *wrapper* `scripts/supabase.mjs`.
 
 ## Como rodar
 
@@ -67,109 +44,121 @@ npm run dev                       # http://localhost:3000
 Outros comandos:
 
 ```bash
-npm run db:reset    # recria o banco: migração + dados fictícios
-npm test            # db:reset + unitários + integração (RLS) + ponta a ponta (Playwright)
-npm run test:unit   # regras de cálculo e validação
-npm run test:db     # cenários de aceite direto no banco, autenticado como cada usuário
-npm run test:e2e    # navegador, contra o build de produção na porta 3100
-npm run typecheck && npm run lint
+npm run db:reset    # recria o banco: migrações + dados fictícios
+npm test            # db:reset + unitários + banco (RLS) + ponta a ponta (Playwright)
+npm run test:unit | test:db | test:e2e
+npm run typecheck && npm run lint && npm run build
 npm run db:stop     # desliga o Supabase local
 ```
 
-## Roteiro de demonstração (~5 min)
+**Worktrees paralelas** (ambiente isolado): `npm run ambiente:isolado -- <1..4>` grava o slot da worktree, sobe uma pilha Supabase própria (portas 54(5+n)xx) e gera o `.env.local` com `E2E_PORT = 3100 + 100·n`. Sem slot, tudo funciona como acima.
 
-Comece com `npm run db:reset` para partir dos dados fictícios.
+## Roteiro de demonstração (~12 min)
+
+Comece com `npm run db:reset`. As datas dos dados fictícios estão em outubro e novembro de 2026.
 
 **1. Vendedora — Paula**
-1. Entre como `paula@exemplo.test`. A tela inicial é **Clientes**: ela vê só os próprios clientes (Marcos e Beatriz).
-2. **Novo cliente** → "Fernanda Rocha", telefone `(11) 98888-0001`, origem Instagram → **Salvar cliente**.
-3. Na ficha da cliente → **Nova negociação** → serviço *Consultoria Inicial*, *Unidade Sul*, valor `650,00` → **Criar negociação**.
-4. Em **Registrar resultado** → **Fechou** → data da venda `31/10/2026`, execução prevista `12/11/2026` → **Salvar resultado**. O status muda para *Fechou* e o histórico registra a mudança.
-5. **Relatório mensal** → outubro de 2026: a venda da Fernanda aparece ao lado das demais vendas da Paula.
+1. Entre como `paula@exemplo.test`. Em **Clientes** ela vê só os próprios (Marcos e Beatriz).
+2. **Novo cliente** → "Fernanda Rocha", telefone `(11) 98888-0001`, origem Instagram → **Salvar**. Na ficha → **Editar** → acrescente uma observação e salve.
+3. **Nova negociação** → *Consultoria Inicial*, *Unidade Sul*, `650,00` → **Registrar resultado** → **Fechou**, venda em `31/10/2026`, execução prevista para `12/11/2026`. A seção **Execução** aparece como *pendente*.
+4. **Clientes → Marcos Teixeira:** a ficha mostra as duas negociações (uma fechada, uma não fechada), as **próximas ações** (acompanhamento em 18/11) e as **conversas** (a de 27/10 aparece já corrigida).
+5. Abra a negociação *Pacote Mensal* do Marcos → **Execução → Realizada em 04/11/2026**. O histórico registra a mudança.
+6. Na ficha do Marcos → **Nova ação** → ligação, *realizada*, hoje, com descrição. Depois **Registrar conversa** → WhatsApp, data e texto.
+7. Abra a conversa nova → **Corrigir** → ajuste o texto e informe o motivo. A versão anterior continua legível na cadeia de versões.
+8. **Vendas → outubro de 2026:** a venda da Fernanda aparece; **Exportar CSV** baixa o arquivo para o Excel.
 
 **2. Isolamento — Rafael**
-1. Copie a URL da negociação da Fernanda, clique em **Sair** e entre como `rafael@exemplo.test`.
-2. Cole a URL: aparece **"Registro não encontrado"**, a mesma resposta de um registro inexistente.
-3. Em Clientes ele vê só Juliana e Carlos. O relatório de outubro mostra só a venda dele.
+1. Entre como `rafael@exemplo.test` e cole a URL de uma negociação ou conversa da Paula: aparece **"Registro não encontrado"**.
+2. Em Clientes, Ações e Conversas ele vê só os registros dele (Juliana e Carlos).
 
 **3. Gestora — Verônica**
-1. Entre como `veronica@exemplo.test`. A tela inicial é o **Relatório mensal**.
-2. Cole a URL da negociação da Fernanda: os dados aparecem completos, sem o formulário de edição (a gestora só consulta).
-3. **Relatório → outubro de 2026**: 3 vendas fechadas, R$ 2.650,00, 1 não fechada, conversão 75%. A tabela **Por vendedor(a)** mostra Paula e Rafael.
-   - A venda do Marcos (fechada em 28/10, com execução prevista para 04/11) está em **outubro**.
-4. **Próximo →** (novembro): nem a venda do Marcos nem a da Fernanda aparecem. Aparece só a venda da Juliana, fechada em 03/11.
-5. **Clientes → Marcos Teixeira**: duas negociações separadas, *Pacote Mensal / Centro — Fechou* e *Avaliação Completa / Norte — Não fechou*.
+1. Entre como `veronica@exemplo.test`. A tela inicial é o **Painel** do mês, com cards de vendas, execuções, ações e conversas, e a tabela por vendedor.
+2. **Painel → novembro de 2026.** Só com os dados fictícios originais (logo após o `db:reset`):
+   - 1 venda fechada (R$ 1.200,00, da Juliana);
+   - execuções: 2 pendentes previstas para o mês (Marcos em 04/11 e Juliana em 10/11), ambas contadas como **atrasadas** a partir de 11/11/2026;
+   - ações: 3 planejadas, 1 realizada, 1 cancelada;
+   - 1 conversa.
+
+   Os passos da Paula alteram esses números: a execução do Marcos passa a *realizada*, a da Fernanda (12/11) entra como pendente, e a ação e a conversa novas entram nas contagens.
+3. **Vendas → outubro:** as vendas da Paula e do Rafael, com o total por vendedor. A venda do Marcos (fechada em 28/10, executada em 04/11) está em **outubro** em Vendas e em **novembro** em Execução.
+4. **Conversas:** filtre por vendedor e canal, abra uma conversa da Paula → **Registrar análise**. Entre de novo como Paula: ela **não vê** a análise.
+5. Abra qualquer negociação, ação ou conversa: a gestora consulta tudo, mas não há formulário de edição.
 
 ## Como está organizado
 
 ```
-supabase/migrations/…_fundacao.sql  schema, gatilhos, view, função do relatório e RLS
-supabase/seed.sql                   2 vendedores, 1 gestora, unidades, serviços, clientes e negociações fictícios
-src/proxy.ts                        renova a sessão e manda para /login quem não está logado
-src/lib/auth.ts                     usuário atual + perfil
-src/lib/relatorio.ts                consolidação dos indicadores do mês (testada)
-src/app/(app)/…                     telas: clientes, negociações, relatório
-tests/unit | tests/integracao | tests/e2e
+supabase/migrations/   fundação, telefone canônico/recusa, execuções+ações+conversas (todas aditivas)
+supabase/seed.sql      2 vendedores, 1 gestora e dados fictícios de todos os módulos
+scripts/               wrapper do Supabase por slot, geração do .env.local
+src/proxy.ts           sessão; sem login → /login (CSV → 401)
+src/app/(app)/         clientes, negociacoes, acoes, conversas, relatorio (+execucao, CSV), painel
+src/lib/               consolidações puras (relatório, execução, painel, ações, conversas, CSV)
+tests/                 unit | integracao (RLS e regras) | e2e
+docs/                  arquitetura, especificação, plano, QA, relatórios dos agentes
 ```
 
-### Regras implementadas
+## Regras implementadas
 
-- **A venda é a negociação.** Cada negociação tem exatamente 1 serviço e 1 unidade, com status, valor e datas próprios. Um cliente pode ter várias negociações e os resultados não se misturam.
-- **Status:** *em negociação*, *fechou* ou *não fechou*.
-  - *Fechou* exige a data da venda.
-  - *Não fechou* exige a data da recusa e o motivo.
-  - A execução prevista não pode ser anterior à venda.
-  - Essas regras são checadas no banco, não apenas na tela.
-- **Acesso (RLS no Postgres):**
+- **A venda é a negociação**: 1 serviço e 1 unidade, com resultado próprio. Um cliente pode ter várias.
+- **Status da negociação:** *Fechou* exige a data da venda; *Não fechou* exige a data da recusa e o motivo, e limpa a execução. A execução prevista não pode ser anterior à venda. Tudo isso é garantido no banco.
+- **Acesso (RLS):**
   - o vendedor lê e edita só o que é dele;
   - a gestora lê tudo e não edita registros dos vendedores;
   - ninguém exclui pela aplicação;
   - quem não está logado não acessa nada;
-  - o cadastro público de usuários está desligado.
-- **Telefone (regra provisória: único em toda a base):**
-  - Cadastro e edição gravam a **chave canônica**: só dígitos, sem o DDI 55. Ou seja, `+55 (11) 90000-0001`, `5511900000001` e `(11) 90000-0001` são o mesmo telefone.
-  - O 55 só é removido quando o número tem 12 ou 13 dígitos (55 + DDD + 8 ou 9). Números locais nunca mudam: `(11) 9000-0001` (8 dígitos) e `(11) 90000-0001` (9 dígitos) continuam diferentes, e o DDD 55 é preservado.
-  - Só são aceitos DDD + 8 ou 9 dígitos. Quem tenta cadastrar um telefone existente recebe a mesma mensagem genérica, sem saber de quem é o cliente.
-  - Tudo isso é garantido no banco (`garantir_telefone_canonico`), inclusive contra cadastros simultâneos.
-- **Telefones já gravados antes da correção:** a migração `…_telefone_canonico_e_recusa_sem_execucao.sql` executa `reconciliar_telefones()`:
-  - números com +55 sem conflito são apenas normalizados;
-  - se a normalização revelar duplicatas, **nenhum registro é apagado nem mesclado**: os clientes envolvidos ficam com `telefone_em_revisao = true` e entram em `conflitos_telefone`, com o telefone original;
-  - telefones em formato inválido ficam preservados como estavam e também entram na lista;
-  - a gestora consulta `conflitos_telefone`, e as telas mostram o selo **"Telefone em revisão"**;
-  - a marcação é exclusiva da administração, e um novo cadastro com uma chave em revisão continua bloqueado.
-- **"Não fechou" não tem execução prevista:** ao mudar para *Não fechou*, a data de execução prevista é limpa na mesma operação. O banco faz isso mesmo que a requisição não peça (gatilho), uma restrição impede o contrário e o histórico registra a mudança com o autor. Registros antigos nessa situação foram limpos pela migração e registrados no histórico como alteração do sistema.
-- **Histórico:** criação e mudanças de status, valor, datas, serviço e unidade, com autor e horário.
-- **Relatório mensal (hipótese provisória H3):** a venda entra no mês da **data da venda**; a recusa entra no mês da data da recusa; a data de execução não muda o mês. A conversão é fechadas ÷ (fechadas + não fechadas).
+  - perfil inativo não acessa nada;
+  - o cadastro público está desligado.
+- **Telefone (provisório):**
+  - chave canônica: só dígitos, sem o DDI 55 (+55 e sem +55 são o mesmo número);
+  - números de 8 e 9 dígitos continuam distintos;
+  - único em toda a base;
+  - conflitos legados ficam preservados e marcados como "Telefone em revisão".
+- **Histórico** com autor e horário para negociações (inclusive a execução) e ações.
+- **Relatório de vendas:** a venda entra no mês da data da venda; a recusa, no mês da data da recusa. Conversão = fechadas ÷ (fechadas + não fechadas). O CSV traz as mesmas linhas.
 
-### Decisões que ainda dependem da cliente
+### Regras PROVISÓRIAS aprovadas para o MVP (dependem de confirmação da cliente)
 
-O comportamento atual é provisório até a cliente confirmar cada ponto.
+A implementação usa só migrações aditivas e enums ampliáveis, então ajustes futuros não perdem dados.
+
+- **H-E Execuções:**
+  - só negociações fechadas têm execução;
+  - status: pendente, realizada ou cancelada;
+  - quem registra é o vendedor;
+  - "realizada" exige a data, que não pode ser anterior à venda; "cancelada" exige motivo;
+  - o relatório de execução usa a data realizada (realizadas) ou a prevista (pendentes e canceladas). *Atrasada* = pendente com previsão anterior a hoje.
+- **H-A Ações comerciais:**
+  - ligadas a um cliente (e, opcionalmente, a uma negociação dele) e ao responsável;
+  - status: planejada, realizada ou cancelada;
+  - o relatório mensal separa planejadas, realizadas e canceladas;
+  - nada é excluído: a ação é cancelada.
+- **H-C Conversas:**
+  - registro manual em texto, sem anexos;
+  - imutável depois de salva: a correção cria uma nova versão ligada à anterior, que permanece;
+  - a gestora registra análises; o vendedor não as vê.
+
+## Decisões que ainda dependem da cliente
 
 | # | Decisão | Como está hoje |
 |---|---|---|
-| 1 | O telefone é único em toda a base ou só por vendedor? Pode haver telefone compartilhado, como o de uma família? | Único em toda a base |
-| 2 | O que fazer quando o cliente já pertence a outro vendedor: avisar o responsável, transferir, ou a gestão decide? | Bloqueia com mensagem genérica e orienta a falar com a gestão |
-| 3 | Como resolver telefones em revisão (manter um, corrigir o número, mesclar clientes) e quem pode fazer isso | Ficam marcados; a resolução é manual, sem tela |
-| 4 | Números estrangeiros, ou antigos de 8 dígitos que hoje têm 9 | Só DDD + 8 ou 9 dígitos; 8 e 9 dígitos são números diferentes |
-| 5 | A recusa conta pela data em que aconteceu ou pela data do registro? A conversão olha o mês do resultado ou o mês de início da negociação? | Conta pela data da recusa informada (o padrão é hoje), no mês do resultado |
-| 6 | Meses encerrados podem mudar quando alguém altera um resultado ou uma data? | Podem; a mudança fica só no histórico |
-| 7 | Aceitar venda ou recusa em data futura, ou recusa anterior à criação da negociação? | Aceita |
-| 8 | Uma venda fechada pode virar "Não fechou"? Ela some do mês original ou aparece como cancelamento? | Pode; sai do mês da venda e entra no mês da recusa |
-| 9 | Reabrir uma negociação recusada deve recuperar a execução prevista? | Não; a execução precisa ser informada de novo ao fechar |
-| 10 | Negociações em aberto entram no relatório mensal como pipeline? | Não entram |
+| 1 | O telefone é único na base toda ou por vendedor? Pode haver telefone compartilhado? | Único na base toda |
+| 2 | O que fazer quando o cliente já pertence a outro vendedor | Bloqueia com mensagem genérica |
+| 3 | Como e por quem os telefones em revisão são resolvidos | Marcados; sem tela de resolução |
+| 4 | Números estrangeiros; números antigos de 8 dígitos | Só DDD + 8 ou 9 dígitos, tratados como distintos |
+| 5 | Mês da recusa e base da conversão | Data da recusa; mês do resultado |
+| 6 | Meses encerrados podem mudar? | Podem; fica registrado no histórico |
+| 7 | Datas futuras, ou recusa anterior à criação | Aceitas |
+| 8 | Uma venda fechada pode virar "Não fechou"? | Pode; sai do mês da venda |
+| 9 | Reabrir uma recusa recupera a execução prevista? | Não |
+| 10 | Pipeline (negociações em aberto) no relatório | Não entra |
+| 11 | Definição de "ação de venda do mês" | **H-A** (provisório) |
+| 12 | Execução: quem registra e se pode divergir da venda | **H-E** (provisório): vendedor; mesmo serviço e unidade |
+| 13 | Conversas: canais, retenção, LGPD, visibilidade da análise | **H-C** (provisório). **Bloqueia o uso com dados reais** |
+| 14 | Integrações externas | Nenhuma |
+| 15 | Execuções atrasadas de meses anteriores devem aparecer no relatório do mês corrente? | Aparecem só no mês em que estavam previstas |
+| 16 | Ação realizada com data futura, ou planejada com data passada | Aceitas |
+| 17 | A coluna Valor do CSV de vendas deve mostrar as recusas? | Mostra, como na tela |
+| 18 | A lista de origens do cliente é fechada? | Lista fixa (Instagram, WhatsApp, Indicação, Site, Outro) |
 
-Decisões também pendentes para as próximas etapas:
+## Fora do MVP (P2)
 
-| # | Decisão | Etapa |
-|---|---|---|
-| 11 | O que é uma "ação de venda do mês" (meta, campanha, tarefa por cliente?) e quem a cria | 2 |
-| 12 | Execução realizada: quem registra, e se pode diferir da unidade/serviço vendidos | 3 |
-| 13 | Conversas: quais canais, quem registra, o que a gestora pode ver/anotar, retenção e LGPD | 4 |
-| 14 | Integrações: quais canais/APIs, permissões, consentimento e custos | 5 |
-
-### Fora de escopo (Etapa 1)
-
-- Ações comerciais, conversas, relatório de execução (etapas 2 a 4).
-- Integrações com serviços externos e uso de dados reais.
-- Exportação CSV, painel avançado, cadastro de usuários/serviços/unidades pela tela e edição de dados do cliente.
-- Deploy em ambiente remoto.
+Configurações pela tela (serviços, unidades, usuários), paginação e filtros extras, resolução de telefones em revisão (decisão 3), melhorias visuais, logout automático do perfil inativo (o acesso já está bloqueado; ver o QA) e deploy remoto.

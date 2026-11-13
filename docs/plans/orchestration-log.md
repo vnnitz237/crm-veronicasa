@@ -26,3 +26,6 @@ Registro cronológico de comandos reais do Orca, recibos, medições de memória
 | 13/11 | **B2 entregue** (`722ff08`, `4e4065a`). Revisão: só arquivos novos de B; conversas sem UPDATE/DELETE; análise só gestora (ação e consulta) | `docs/reports/b-B2.md` |
 | 13/11 | **Merge B2** → `c0c6555`. **I2 (coordenador):** menu (Painel/Ações/Conversas/Vendas/Execução), gestora → `/painel`, `ProximasAcoes` + `ConversasCliente` na ficha; asserção de `demonstracao.spec.ts` `/relatorio$`→`/painel$` (D ocioso, sem concorrência) | — |
 | 13/11 | Gates I2: typecheck/lint/build ok; unit 38/38; db 42/42; e2e 8/8. Varredura de telas por perfil no build de produção: 36/36 (200/404 esperados), 0 erros de JS | `i2.log`, `scratchpad/i2/varredura.mjs` |
+| 13/11 | I2 commitada (`0697b59`). Slot 0 parado; D avançado (ff) para `0697b59`, slot 4 com as 3 migrações | — |
+| 13/11 | **D2** iniciado (QA independente M1–M6 + segurança + responsividade) | task `task_d232e5bb385d`, dispatch `ctx_b384b07cf2a3`, `ready` |
+| 13/11 | README reescrito (situação, regras provisórias H-E/H-A/H-C, decisões 1–18, roteiro de demonstração completo). Números do roteiro a conferir na I3 | — |
