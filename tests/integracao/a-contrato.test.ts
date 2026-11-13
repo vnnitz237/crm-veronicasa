@@ -361,3 +361,21 @@ describe("M3 — conversas e análises", () => {
     });
   });
 });
+
+// ===========================================================================
+describe("D2-04 — funções de gatilho sem EXECUTE para anon", () => {
+  it("nenhuma função de public que retorna trigger é executável por anon", async () => {
+    await emTransacaoDesfeita(async (c) => {
+      const r = await c.query(`
+        select p.oid::regprocedure::text as funcao
+        from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+        where n.nspname = 'public' and p.prorettype = 'trigger'::regtype
+          and has_function_privilege('anon', p.oid, 'execute')`);
+      expect(r.rows.map((x) => x.funcao)).toEqual([]);
+      const total = await c.query(`
+        select count(*)::int as n from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+        where n.nspname = 'public' and p.prorettype = 'trigger'::regtype`);
+      expect(total.rows[0].n).toBeGreaterThanOrEqual(11);
+    });
+  });
+});
