@@ -12,7 +12,7 @@ function porcentagem(v: number | null) {
 
 function TabelaGrupo({ titulo, coluna, grupos, testId }: { titulo: string; coluna: string; grupos: Grupo[]; testId: string }) {
   return (
-    <section className="cartao overflow-x-auto p-0">
+    <section className="cartao min-w-0 overflow-x-auto p-0">
       <h2 className="px-4 pt-3 font-semibold">{titulo}</h2>
       <table className="tabela" data-testid={testId}>
         <thead>
@@ -57,10 +57,10 @@ export default async function RelatorioPage({ searchParams }: PageProps<"/relato
             {nomeDoMes(mes.ano, mes.mes)} · {ehGestor ? "todos os vendedores" : "minhas negociações"}
           </p>
         </div>
-        <nav className="ml-auto flex items-center gap-2 text-sm">
+        <nav className="flex w-full flex-wrap items-center gap-2 text-sm sm:ml-auto sm:w-auto">
           <Link href={`/relatorio?mes=${mesParaTexto(deslocarMes(mes, -1))}`} className="botao-secundario py-1">← Anterior</Link>
-          <form className="flex gap-2">
-            <input type="month" name="mes" defaultValue={mesParaTexto(mes)} className="campo py-1" aria-label="Mês" />
+          <form className="flex min-w-0 gap-2">
+            <input type="month" name="mes" defaultValue={mesParaTexto(mes)} className="campo w-40 min-w-0 py-1" aria-label="Mês" />
             <button className="botao-secundario py-1">Ver</button>
           </form>
           <Link href={`/relatorio?mes=${mesParaTexto(deslocarMes(mes, 1))}`} className="botao-secundario py-1">Próximo →</Link>
@@ -87,7 +87,7 @@ export default async function RelatorioPage({ searchParams }: PageProps<"/relato
         <TabelaGrupo titulo="Por unidade" coluna="Unidade" grupos={agruparPor(linhas, "unidade_nome")} testId="grupo-unidade" />
       </div>
 
-      <section className="cartao overflow-x-auto p-0">
+      <section className="cartao min-w-0 overflow-x-auto p-0">
         <h2 className="px-4 pt-3 font-semibold">Negociações com resultado no mês</h2>
         <table className="tabela" data-testid="relatorio-detalhe">
           <thead>
