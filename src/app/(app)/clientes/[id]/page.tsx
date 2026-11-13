@@ -35,6 +35,9 @@ export default async function ClientePage({ params }: PageProps<"/clientes/[id]"
         <Link href="/clientes" className="link text-sm">← Clientes</Link>
         <h1 className="mt-1 text-xl font-semibold" data-testid="cliente-nome">{cliente.nome}</h1>
         <p className="text-sm text-suave">Responsável: {cliente.vendedor?.nome}</p>
+        {podeEditar && (
+          <Link href={`/clientes/${cliente.id}/editar`} className="botao-secundario mt-2 inline-block py-1 text-sm" data-testid="editar-cliente">Editar</Link>
+        )}
       </div>
 
       <dl className="cartao grid gap-3 sm:grid-cols-3 text-sm">
