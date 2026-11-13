@@ -21,3 +21,8 @@ Registro cronológico de comandos reais do Orca, recibos, medições de memória
 | 13/11 | **Merge A1** → `dd17d3c`. Gates no slot 0: typecheck/lint/build ok; unit 20/20; db 42/42; e2e 8/8 | log `i1a.log` |
 | 13/11 | **I1 concluída.** Briefs B2/C2 → `9809189`. Branches B e C avançadas (ff) para a integração; B preparado (slot 2), C religado (slot 3); pilhas s1, s4 e slot 0 paradas | — |
 | 13/11 | **B2** iniciado (worktree `crm-b-frontend`) e **C2** iniciado (`crm-c-fluxos`) | B2: task `task_6c6619f60afe`, dispatch `ctx_1511b70184b1`; C2: task `task_a005588f261b`, dispatch `ctx_ca0f9332cea1`; ambos `ready` |
+| 13/11 | **C2 entregue** (`05f08c4`, `c8216e7`). Revisão: arquivos dentro do escopo; `registrarExecucao` reconfere dono/perfil/status e filtra o UPDATE; painel 404 para vendedor. Ponto comercial novo: atrasadas de meses anteriores (decisão 15) | `docs/reports/c-C2.md` |
+| 13/11 | **Merge C2** → `48d0284`. Gates: build ok; unit 26/26; db 42/42; e2e 8/8 | `i2c.log` |
+| 13/11 | **B2 entregue** (`722ff08`, `4e4065a`). Revisão: só arquivos novos de B; conversas sem UPDATE/DELETE; análise só gestora (ação e consulta) | `docs/reports/b-B2.md` |
+| 13/11 | **Merge B2** → `c0c6555`. **I2 (coordenador):** menu (Painel/Ações/Conversas/Vendas/Execução), gestora → `/painel`, `ProximasAcoes` + `ConversasCliente` na ficha; asserção de `demonstracao.spec.ts` `/relatorio$`→`/painel$` (D ocioso, sem concorrência) | — |
+| 13/11 | Gates I2: typecheck/lint/build ok; unit 38/38; db 42/42; e2e 8/8. Varredura de telas por perfil no build de produção: 36/36 (200/404 esperados), 0 erros de JS | `i2.log`, `scratchpad/i2/varredura.mjs` |

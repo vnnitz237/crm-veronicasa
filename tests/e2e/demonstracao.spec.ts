@@ -103,7 +103,7 @@ test("outro vendedor não acessa os registros da Paula, nem por URL direta", asy
 
 test("gestora vê a mesma negociação e confere no relatório de outubro", async ({ page }) => {
   await entrar(page, "veronica");
-  await expect(page).toHaveURL(/\/relatorio$/);
+  await expect(page).toHaveURL(/\/painel$/);
 
   await page.goto(urlNegociacao);
   await expect(page.getByTestId("negociacao-titulo")).toHaveText("Consultoria Inicial · Unidade Sul");

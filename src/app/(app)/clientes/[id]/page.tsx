@@ -6,6 +6,8 @@ import { ehUuid } from "@/lib/validacao";
 import { formatarData, formatarMoeda, formatarTelefone } from "@/lib/formato";
 import { StatusBadge } from "@/components/status";
 import { AvisoTelefoneEmRevisao } from "@/components/telefone";
+import { ProximasAcoes } from "@/components/acoes/ProximasAcoes";
+import { ConversasCliente } from "@/components/conversas/ConversasCliente";
 
 export default async function ClientePage({ params }: PageProps<"/clientes/[id]">) {
   const { id } = await params;
@@ -80,6 +82,9 @@ export default async function ClientePage({ params }: PageProps<"/clientes/[id]"
           </table>
         </div>
       </section>
+
+      <ProximasAcoes clienteId={cliente.id} podeCriar={podeEditar} />
+      <ConversasCliente clienteId={cliente.id} podeCriar={podeEditar} />
     </div>
   );
 }

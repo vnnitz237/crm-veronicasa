@@ -12,9 +12,13 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <Link href="/" className="font-semibold">CRM Verônica Sá</Link>
           <nav className="flex flex-wrap gap-4 text-sm">
+            {ehGestor && <Link href="/painel" className="link">Painel</Link>}
             <Link href="/clientes" className="link">Clientes</Link>
             <Link href="/negociacoes" className="link">Negociações</Link>
-            <Link href="/relatorio" className="link">Relatório mensal</Link>
+            <Link href="/acoes" className="link">Ações</Link>
+            <Link href="/conversas" className="link">Conversas</Link>
+            <Link href="/relatorio" className="link">Vendas</Link>
+            <Link href="/relatorio/execucao" className="link">Execução</Link>
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm">
             <span data-testid="usuario-atual">
