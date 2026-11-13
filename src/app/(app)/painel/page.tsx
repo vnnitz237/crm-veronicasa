@@ -69,10 +69,10 @@ export default async function PainelPage({ searchParams }: PageProps<"/painel">)
           <h1 className="text-xl font-semibold">Painel gerencial</h1>
           <p className="text-sm text-suave" data-testid="painel-mes">{nomeDoMes(mes.ano, mes.mes)} · todos os vendedores</p>
         </div>
-        <nav className="ml-auto flex items-center gap-2 text-sm">
+        <nav className="flex w-full flex-wrap items-center gap-2 text-sm sm:ml-auto sm:w-auto">
           <Link href={`/painel?mes=${mesParaTexto(deslocarMes(mes, -1))}`} className="botao-secundario py-1">← Anterior</Link>
-          <form className="flex gap-2">
-            <input type="month" name="mes" defaultValue={texto} className="campo py-1" aria-label="Mês" />
+          <form className="flex min-w-0 gap-2">
+            <input type="month" name="mes" defaultValue={texto} className="campo w-40 min-w-0 py-1" aria-label="Mês" />
             <button className="botao-secundario py-1">Ver</button>
           </form>
           <Link href={`/painel?mes=${mesParaTexto(deslocarMes(mes, 1))}`} className="botao-secundario py-1">Próximo →</Link>
