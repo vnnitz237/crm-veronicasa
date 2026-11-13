@@ -54,9 +54,9 @@ export default async function AcoesPage({ searchParams }: PageProps<"/acoes">) {
             {nomeDoMes(mes.ano, mes.mes)} · {ehGestor ? "todos os vendedores" : "minhas ações"}
           </p>
         </div>
-        <nav className="ml-auto flex items-center gap-2 text-sm">
+        <nav className="ml-auto flex flex-wrap items-center gap-2 text-sm">
           <Link href={`/acoes?mes=${mesParaTexto(deslocarMes(mes, -1))}`} className="botao-secundario py-1">← Anterior</Link>
-          <form className="flex gap-2">
+          <form className="flex flex-wrap gap-2">
             <input type="month" name="mes" defaultValue={mesParaTexto(mes)} className="campo py-1" aria-label="Mês" />
             <button className="botao-secundario py-1">Ver</button>
           </form>

@@ -40,7 +40,7 @@ export async function registrarConversa(_: EstadoConversa, formData: FormData): 
     ["cliente_id", "negociacao_id", "canal", "ocorrida_em"].map((c) => [c, texto(formData, c)]),
   );
   // O conteúdo preserva espaços e quebras de linha; só checamos se não está vazio.
-  const conteudo = String(formData.get("conteudo") ?? "");
+  const conteudo = String(formData.get("conteudo") ?? "").replace(/\r\n?/g, "\n");
   valores.conteudo = conteudo.trim() ? conteudo : "";
   if (usuario.perfil !== "vendedor") return { erro: "Somente vendedores registram conversas.", valores };
   if (!ehUuid(valores.cliente_id)) return { erro: "Cliente inválido.", valores };
@@ -74,7 +74,7 @@ export async function corrigirConversa(_: EstadoConversa, formData: FormData): P
   const valores = Object.fromEntries(
     ["substitui_conversa_id", "canal", "ocorrida_em", "motivo_correcao"].map((c) => [c, texto(formData, c)]),
   );
-  const conteudo = String(formData.get("conteudo") ?? "");
+  const conteudo = String(formData.get("conteudo") ?? "").replace(/\r\n?/g, "\n");
   valores.conteudo = conteudo.trim() ? conteudo : "";
   if (usuario.perfil !== "vendedor") return { erro: "Somente o vendedor responsável corrige a conversa.", valores };
   if (!ehUuid(valores.substitui_conversa_id)) return { erro: "Conversa não encontrada.", valores };

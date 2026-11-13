@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { obterUsuarioAtual } from "@/lib/auth";
 import { criarClienteSupabase } from "@/lib/supabase/server";
-import { ehDataValida, ehUuid } from "@/lib/validacao";
+import { ehDataValida, ehUuid, lerMes, mesParaTexto } from "@/lib/validacao";
+import { nomeDoMes } from "@/lib/formato";
 import { CANAIS_CONVERSA, ehCanal, fimDoDia, formatarDataHora, inicioDoDia, ROTULO_CANAL } from "@/lib/conversas";
 
 function param(v: string | string[] | undefined): string {
@@ -12,11 +13,15 @@ export default async function ConversasPage({ searchParams }: PageProps<"/conver
   const usuario = await obterUsuarioAtual();
   const sp = await searchParams;
   const ehGestor = usuario.perfil === "gestor";
+  // ?mes=AAAA-MM (link do painel) tem precedência: preenche de/até com o 1º e o último dia do mês.
+  const mesValido = typeof sp.mes === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(sp.mes);
+  const mes = mesValido ? lerMes(sp.mes, { ano: 0, mes: 0 }) : null;
+  const ultimoDia = mes ? new Date(Date.UTC(mes.ano, mes.mes, 0)).getUTCDate() : 0;
   const filtro = {
     vendedor: ehGestor && ehUuid(param(sp.vendedor)) ? param(sp.vendedor) : "",
     canal: ehCanal(param(sp.canal)) ? param(sp.canal) : "",
-    de: ehDataValida(param(sp.de)) ? param(sp.de) : "",
-    ate: ehDataValida(param(sp.ate)) ? param(sp.ate) : "",
+    de: mes ? `${mesParaTexto(mes)}-01` : ehDataValida(param(sp.de)) ? param(sp.de) : "",
+    ate: mes ? `${mesParaTexto(mes)}-${String(ultimoDia).padStart(2, "0")}` : ehDataValida(param(sp.ate)) ? param(sp.ate) : "",
   };
 
   const supabase = await criarClienteSupabase();
@@ -44,7 +49,9 @@ export default async function ConversasPage({ searchParams }: PageProps<"/conver
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-semibold">Conversas</h1>
-        <p className="text-sm text-suave">{ehGestor ? "Todos os vendedores" : "Minhas conversas"} · versões atuais</p>
+        <p className="text-sm text-suave">{ehGestor ? "Todos os vendedores" : "Minhas conversas"} · versões atuais
+          {mes && <> · <span data-testid="conversas-mes">{nomeDoMes(mes.ano, mes.mes)}</span></>}
+        </p>
       </div>
 
       <form className="cartao flex flex-wrap items-end gap-3 text-sm" data-testid="filtros-conversas">
@@ -72,6 +79,11 @@ export default async function ConversasPage({ searchParams }: PageProps<"/conver
           <label htmlFor="ate" className="rotulo">Até</label>
           <input id="ate" name="ate" type="date" defaultValue={filtro.ate} className="campo py-1" />
         </div>
+        {mes && (
+          <p className="w-full text-xs text-suave">
+            Mês ativo: {nomeDoMes(mes.ano, mes.mes)}. Ao alterar o período, o filtro de mês é substituído.
+          </p>
+        )}
         <button className="botao-secundario py-1">Filtrar</button>
         <Link href="/conversas" className="link">Limpar</Link>
       </form>
