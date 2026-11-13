@@ -28,4 +28,4 @@
 - Sem bloqueios.
 
 ## 5. Commit
-Ver `git log` — `[A1] Contrato de dados: execuções, ações e conversas`.
+`8f1f3da` — `[A1] Contrato de dados: execuções, ações e conversas`.
