@@ -1,7 +1,7 @@
-# Relatório de QA — M1–M6 (Agente D, tarefa D2)
+# Relatório de QA — M1–M6 (Agente D, tarefas D2 e D3 — situação final)
 
-Data: 13/11/2026 · branch `crm/d-qa` (sincronizada com a integração I2) · slot 4 · dados fictícios do seed.
-Execução: `npm test` (db:reset + unit 38/38 + banco 57/57 + e2e 42/42, sendo 2 falhas **esperadas** marcadas com `test.fail` para defeitos conhecidos). Saída: EXIT 0.
+Data: 13/11/2026 · branch `crm/d-qa` na integração `435e7bf` (correções W3) · slot 4 · dados fictícios do seed.
+**Execução final (D3):** `npm test` (db:reset + unit 38/38 + banco 59/59 + e2e 42/42, **sem nenhum `test.fail`**). Saída: EXIT 0.
 
 Legenda: **PASSOU** · **FALHOU** · **BLOQUEADO** (não verificável nesta tarefa).
 
@@ -13,7 +13,9 @@ Legenda: **PASSOU** · **FALHOU** · **BLOQUEADO** (não verificável nesta tare
 ## 2. M0
 | ID | Situação | Evidência |
 |---|---|---|
-| QA-M0-1/2/3 | BLOQUEADO | Fora do escopo do D2 (exige duas pilhas em paralelo; restrição de memória). A suíte inteira roda no slot 4 sem tocar no slot 0 |
+| QA-M0-1 | PASSOU | Slot 4 em 549xx (`.env.local`: API 54921, banco 54922, e2e 3500), gerado pelo ambiente isolado |
+| QA-M0-2 | PASSOU (isolamento) / BLOQUEADO (simultaneidade) | Contagem no slot 0 (`supabase_db_crm-veronica`, porta 54522), só SELECT via `docker exec … psql`, antes (18:05:18) e depois (18:06:30) do `npm test` completo no slot 4: clientes 4, negociacoes 6, acoes_venda 6, conversas 3, analises_conversa 1, historico_negociacoes 12 → **idênticas**. A execução simultânea de dois slots não foi refeita aqui (limite de memória) |
+| QA-M0-3 | BLOQUEADO | Slot 0 é do coordenador; não executei nele para não escrever no seu banco |
 
 ## 3. M5 — Edição de cliente
 | ID | Situação | Evidência (`tests/e2e/m4-m5.spec.ts`) |
@@ -55,13 +57,13 @@ Legenda: **PASSOU** · **FALHOU** · **BLOQUEADO** (não verificável nesta tare
 | AC-M2-5 | PASSOU | Rafael 404 por URL e lista sem dados da Paula; gestora vê os dois, por responsável e por tipo |
 | AC-M2-6 | PASSOU | indicadores = contagem da lista; somas por tipo e por responsável = indicadores (3 meses) |
 
-Observação: o `data-testid="acao-situacao"` da especificação **não existe** (ver D2-03); os testes usam `acao-titulo`/`lista-acoes`.
+Regressão D2-03: `acao-situacao` verificado no detalhe ("Cancelada", AC-M2-4) e na lista do mês ("Planejada", AC-M2-2).
 
 ## 7. M3 — Conversas
 | ID | Situação | Evidência (`m3-conversas.spec.ts`) |
 |---|---|---|
 | AC-M3-1 | PASSOU | conversa colada aparece em `conversa-conteudo` e em `conversas-cliente` |
-| AC-M3-2 | PASSOU | sem editar/excluir; correção cria v2; v1 legível com aviso; `/corrigir` da v1 → 404; 2ª correção pela API recusada; UPDATE/DELETE pela API não alteram |
+| AC-M3-2 | PASSOU | conteúdo gravado com `\n` e sem `\r` (regressão D2-05); sem editar/excluir; correção cria v2; v1 legível com aviso; `/corrigir` da v1 → 404; 2ª correção pela API recusada; UPDATE/DELETE pela API não alteram |
 | AC-M3-3 | PASSOU | Rafael 404 em detalhe, correção e nova conversa; lista sem dados da Paula |
 | AC-M3-4 | PASSOU | filtros vendedor, canal, de/até; análise registrada; gestora não cria conversa (404) |
 | AC-M3-5 | PASSOU | vendedor sem seção de análises; SELECT/INSERT/embed pela API vazios ou recusados |
@@ -70,7 +72,7 @@ Observação: o `data-testid="acao-situacao"` da especificação **não existe**
 ## 8. M6 — Painel
 | ID | Situação | Evidência (`m6-painel.spec.ts`) |
 |---|---|---|
-| AC-M6-1 | PASSOU | login → `/painel`; cards = `ind-*` dos relatórios de vendas, execução e ações (out, nov, mês corrente); links levam ao detalhe do mesmo mês |
+| AC-M6-1 | PASSOU | login → `/painel`; cards = `ind-*` dos relatórios de vendas, execução e ações (out, nov, mês corrente); links levam ao detalhe do mesmo mês; "regressão D2-01": `/conversas?mes=` filtra o mês (out só Marcos, nov só Juliana) |
 | AC-M6-2 | PASSOU | Paula e Rafael com as 4 colunas |
 | AC-M6-3 | PASSOU | Paula e Rafael → 404 em `/painel`; tela inicial `/clientes` |
 
@@ -78,25 +80,34 @@ Observação: o `data-testid="acao-situacao"` da especificação **não existe**
 | ID | Situação | Evidência |
 |---|---|---|
 | QA-1 | PASSOU | `qa-seguranca.test.ts` › QA-1: todas as tabelas de `public` com RLS; nenhuma política para anon/public; nenhuma DELETE/ALL; anon não lê nenhuma tabela/visão |
-| QA-2 | PASSOU com ressalva | `search_path` fixo em todas; `perfil_atual` e `reconciliar_telefones` sem execute para anon. **5 funções de gatilho** security definer mantêm execute para anon (ver D2-04) |
+| QA-2 | PASSOU | `search_path` fixo em todas as security definer; **nenhuma** security definer executável por anon (gatilhos incluídos, migração `20261113200000`). A única função de `public` executável por anon é `normalizar_telefone` — security invoker, `immutable`, sem acesso a tabelas (só formata texto); risco nulo, mantida por ser o grant padrão. Teste fixa essa lista exata |
 | QA-3 | PASSOU | Paula e Verônica inativas: leitura vazia em todas as tabelas, visões e RPCs; escrita recusada; perfil restaurado no `finally` |
-| QA-4 | FALHOU (390 px) | `responsividade.spec.ts`: 1280 px ok; 390 px rola em `/painel`, `/relatorio`, `/acoes` (D2-02). Capturas em `test-results/qa4/` (não versionado) |
-| QA-5 | PASSOU parcial | `npm test` verde; `tsc` e `eslint` sem erros em `tests/`. typecheck/lint/build da integração completa ficam com o coordenador |
-| QA-6 | BLOQUEADO | Não auditado nesta tarefa (varredura de segredos no histórico) |
+| QA-4 | PASSOU | `responsividade.spec.ts`: 13 telas sem rolagem horizontal em 390 e 1280 px (sem `test.fail`). Capturas em `test-results/qa4/` (não versionado) |
+| QA-5 | PASSOU | `npm test` verde (inclui `next build` do e2e); `tsc --noEmit` sem erros. Lint completo da integração: coordenador |
+| QA-6 | PASSOU | `git log -p --all`: nenhuma ocorrência de `sb_secret_`, JWT (`eyJhbGci`), chave privada ou senha além da de demonstração; nenhum `.env*` versionado (`.gitignore` tem `.env*`). `src/`: sem `SERVICE_ROLE`, sem URL `http(s)://` e sem `fetch`/`axios`/WebSocket — só o cliente Supabase pela URL do `.env.local` (local) |
 
-## 10. Defeitos
-| ID | Sev. | Descrição | Reproduzir | Arquivo provável |
+## 10. Defeitos (situação final)
+| ID | Sev. | Descrição | Situação final | Evidência |
 |---|---|---|---|---|
-| D2-01 | P2 | O card "Conversas registradas" do painel leva a `/conversas?mes=AAAA-MM`, mas a lista ignora `mes` e mostra todas as conversas (o número do card não bate com a lista aberta) | Gestora → `/painel?mes=2026-10` → clicar no card de conversas: aparece a conversa da Juliana de 02/11 | `src/app/(app)/conversas/page.tsx` (aceitar `mes`) ou `src/app/(app)/painel/page.tsx` (usar `de`/`ate`). Teste `test.fail`: "DEFEITO D2-01" |
-| D2-02 | P2 | Rolagem horizontal da página em 390 px: a barra de navegação do mês (← Anterior / mês / Ver / Próximo → / botões) não quebra linha; `scrollWidth` 444 (painel, ações) e 645 (relatório de vendas) | Viewport 390 px, gestora, abrir `/relatorio?mes=2026-10` | `nav` com `flex` sem `flex-wrap` em `src/app/(app)/relatorio/page.tsx`, `painel/page.tsx`, `acoes/page.tsx`. Teste `test.fail` em `responsividade.spec.ts` |
-| D2-03 | P2 | `data-testid="acao-situacao"` exigido pela especificação não existe | `grep -r acao-situacao src` vazio | `src/components/acoes/SituacaoAcaoBadge.tsx` |
-| D2-04 | P2 | Funções de gatilho security definer (`registrar_historico_acao`, `registrar_historico_negociacao`, `validar_vendedor_negociacao`, `validar_acao_venda`, `validar_conversa`, `garantir_telefone_canonico`) mantêm `EXECUTE` para `anon`. Não são chamáveis pela API (retornam `trigger`), portanto sem risco prático, mas descumprem a letra do QA-2 | `select has_function_privilege('anon', oid, 'execute')` em `pg_proc` | nova migração aditiva com `revoke execute … from public, anon` (Agente A) |
-| D2-05 | P2 (obs.) | Conteúdo de conversa colado em `<textarea>` é gravado com quebras `\r\n` (normalização do navegador); a exibição é correta, mas a comparação textual com a fonte difere | Registrar conversa com várias linhas e ler `conversas.conteudo` | `src/app/(app)/conversas/actions.ts` (normalizar para `\n`, opcional) |
+| D2-01 | P2 | Card de conversas do painel → `/conversas?mes=` ignorava o mês | **CORRIGIDO** (W3-B) | `m6-painel.spec.ts` "regressão D2-01" |
+| D2-02 | P2 | Rolagem horizontal em 390 px em painel, relatórios e ações | **CORRIGIDO** (W3-B/C) | `responsividade.spec.ts` 390 px |
+| D2-03 | P2 | `data-testid="acao-situacao"` ausente | **CORRIGIDO** (W3-B) | `m2-acoes.spec.ts` AC-M2-2 e AC-M2-4 |
+| D2-04 | P2 | Funções de gatilho security definer executáveis por anon | **CORRIGIDO** (W3-A, migração `20261113200000`) | `qa-seguranca.test.ts` QA-2 |
+| D2-05 | P2 | Conteúdo de conversa gravado com `\r\n` | **CORRIGIDO** (W3-B) | `m3-conversas.spec.ts` AC-M3-1/2 |
 
-Nenhum defeito P0/P1 encontrado.
+Nenhum defeito novo encontrado no D3. Observação sem defeito: `normalizar_telefone` executável por anon (ver QA-2).
 
 ## 11. Reavaliação do D-01 (sessão de perfil inativo)
 - O Auth **continua emitindo sessão** para um perfil com `ativo = false` (login com senha funciona).
 - Com essa sessão, a RLS bloqueia tudo: `perfil_atual()` devolve nulo para inativos, e todas as políticas dependem dele. Testado: leitura vazia em `clientes`, `negociacoes`, `historico_*`, `acoes_venda`, `conversas`, `analises_conversa`, `conflitos_telefone`, nas três visões e nas três RPCs; UPDATE sem efeito; INSERT recusado em clientes, ações e conversas. Unidades e serviços também vêm vazios.
 - Único dado visível: a **própria linha** em `perfis` (política `id = auth.uid()`), sem dados comerciais.
 - **Conclusão:** não há risco de acesso a dados; o D-01 continua **P2** (experiência: o usuário inativo entra e vê telas vazias/erro em vez de uma mensagem clara). Recomenda-se, quando oportuno, bloquear na aplicação (`obterUsuarioAtual`) com mensagem de "acesso desativado".
+
+## 12. Critérios para a demonstração
+| # | Critério | Situação |
+|---|---|---|
+| 1 | `db:reset` e roteiro de ponta a ponta | PASSOU — `npm test` faz o reset e `demonstracao.spec.ts` percorre o roteiro (8/8). A conferência textual do README atualizado é do coordenador |
+| 2 | Todos os critérios ✅ e 🆕 aprovados passam | PASSOU — AC-01..11, AC-M1..M6, QA-1..6 e QA-M0-1 passam; QA-M0-2 (simultaneidade) e QA-M0-3 não reexecutados por mim |
+| 3 | README lista o provisório e as decisões abertas | Não avaliado pelo QA (documento do coordenador) |
+
+**Veredito:** **APTO para a demonstração**, do ponto de vista de QA. Não há defeito aberto, de P0 a P2. O D-01 continua P2 e não dá acesso a dados.

@@ -81,12 +81,18 @@ describe("QA-2 — funções security definer", () => {
     expect(f.filter((x) => !(x.proconfig ?? []).some((c) => c.startsWith("search_path="))).map((x) => x.proname)).toEqual([]);
   });
 
-  it("nenhuma executável por anon (exceto funções de gatilho, que não são chamáveis pela API)", async () => {
-    const f = await sql<{ proname: string; gatilho: boolean }>(
-      `select p.proname, p.prorettype = 'trigger'::regtype as gatilho
-         from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  it("nenhuma função security definer executável por anon (inclusive as de gatilho, após D2-04)", async () => {
+    const f = await sql<{ proname: string }>(
+      `select p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace
         where n.nspname = 'public' and p.prosecdef and has_function_privilege('anon', p.oid, 'execute')`);
-    expect(f.filter((x) => !x.gatilho).map((x) => x.proname)).toEqual([]);
+    expect(f.map((x) => x.proname)).toEqual([]);
+  });
+
+  it("anon só executa normalizar_telefone (pura, imutável, security invoker, sem acesso a tabelas)", async () => {
+    const f = await sql<{ proname: string; prosecdef: boolean; provolatile: string }>(
+      `select p.proname, p.prosecdef, p.provolatile from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+        where n.nspname = 'public' and has_function_privilege('anon', p.oid, 'execute') order by 1`);
+    expect(f).toEqual([{ proname: "normalizar_telefone", prosecdef: false, provolatile: "i" }]);
   });
 
   it("RPCs de relatório não devolvem dados ao anon", async () => {

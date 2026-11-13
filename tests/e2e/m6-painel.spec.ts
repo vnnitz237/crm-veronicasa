@@ -69,10 +69,13 @@ test("AC-M6-3: vendedor recebe 404 em /painel e entra em /clientes", async ({ pa
   }
 });
 
-test("DEFEITO D2-01 (P2): o card de conversas leva a /conversas?mes=, mas a lista ignora o mês", async ({ page }) => {
-  test.fail(true, "Conhecido: /conversas só filtra por de/até; o parâmetro mes do link do painel é ignorado.");
+test("regressão D2-01: o card de conversas leva a /conversas?mes= e a lista respeita o mês", async ({ page }) => {
   await entrar(page, "veronica");
   await page.goto("/conversas?mes=2026-10");
   // Juliana (seed) conversou em 02/11: não deveria aparecer em outubro.
-  await expect(page.getByTestId("lista-conversas")).not.toContainText("Juliana Prado", { timeout: 3000 });
+  await expect(page.getByTestId("lista-conversas")).toContainText("Marcos Teixeira"); // 27/10
+  await expect(page.getByTestId("lista-conversas")).not.toContainText("Juliana Prado");
+  await page.goto("/conversas?mes=2026-11");
+  await expect(page.getByTestId("lista-conversas")).toContainText("Juliana Prado");
+  await expect(page.getByTestId("lista-conversas")).not.toContainText("Marcos Teixeira");
 });
