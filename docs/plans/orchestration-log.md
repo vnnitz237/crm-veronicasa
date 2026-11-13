@@ -29,3 +29,6 @@ Registro cronológico de comandos reais do Orca, recibos, medições de memória
 | 13/11 | I2 commitada (`0697b59`). Slot 0 parado; D avançado (ff) para `0697b59`, slot 4 com as 3 migrações | — |
 | 13/11 | **D2** iniciado (QA independente M1–M6 + segurança + responsividade) | task `task_d232e5bb385d`, dispatch `ctx_b384b07cf2a3`, `ready` |
 | 13/11 | README reescrito (situação, regras provisórias H-E/H-A/H-C, decisões 1–18, roteiro de demonstração completo). Números do roteiro a conferir na I3 | — |
+| 13/11 | **D2 entregue** (`d5a1ca1`): todos os AC-M1..M6 PASSOU; QA-1 e QA-3 PASSOU; QA-2 com ressalva; QA-4 FALHOU em 390 px; 5 defeitos P2; D-01 reavaliado sem risco de acesso (RLS bloqueia tudo). `npm test` no slot 4: unit 38, banco 57, e2e 42 (2 `test.fail`) | `docs/qa/relatorio-qa.md` |
+| 13/11 | **Merge D2** → `6bb992d`. Decisão do coordenador: D2-01 (dado incorreto no painel→lista) e D2-02 (responsividade) tratados como obrigatórios (critérios de conclusão); D2-03/04/05 entram na mesma rodada | — |
+| 13/11 | **W3** por `orca orchestration send` (follow-up com contexto): B → D2-01/02(ações)/03/05; C → D2-02 (painel e relatórios); A → D2-04 (migração aditiva `revoke execute`) | B `ctx_dfe8d1744208`, C `ctx_090b206c9f6a`, A `ctx_635436775414`; todos `reopened`/`ready` |
