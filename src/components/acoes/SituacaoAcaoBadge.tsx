@@ -8,7 +8,7 @@ const COR: Record<SituacaoAcao, string> = {
 
 export function SituacaoAcaoBadge({ situacao }: { situacao: SituacaoAcao }) {
   return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${COR[situacao]}`}>
+    <span data-testid="acao-situacao" className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${COR[situacao]}`}>
       {ROTULO_SITUACAO_ACAO[situacao]}
     </span>
   );
