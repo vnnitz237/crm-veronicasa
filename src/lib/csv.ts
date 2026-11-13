@@ -1,6 +1,6 @@
 /**
  * CSV para o Excel em português: BOM UTF-8, separador `;`, quebra CRLF,
- * decimal com vírgula e datas `dd/mm/aaaa`. Função pura.
+ * números com 2 casas e vírgula decimal, datas `dd/mm/aaaa`. Função pura.
  */
 const BOM = "﻿";
 const DATA_ISO = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -9,7 +9,7 @@ const INICIO_PERIGOSO = /^[=+\-@\t\r]/;
 
 function formatarNumero(n: number): string {
   if (!Number.isFinite(n)) return "";
-  return String(n).replace(".", ",");
+  return n.toFixed(2).replace(".", ",");
 }
 
 function celula(valor: string | number | null | undefined): string {

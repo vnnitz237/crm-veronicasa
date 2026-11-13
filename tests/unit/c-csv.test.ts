@@ -8,8 +8,10 @@ describe("gerarCsv", () => {
     expect(csv.slice(1)).toBe("A;B\r\nx;y\r\n");
   });
 
-  it("usa vírgula decimal e não separa milhar", () => {
-    expect(gerarCsv(["V"], [[1234.5], [10], [-3.25]]).slice(1)).toBe("V\r\n1234,5\r\n10\r\n-3,25\r\n");
+  it("usa 2 casas, vírgula decimal e não separa milhar", () => {
+    expect(gerarCsv(["V"], [[1234.5], [10], [-3.25], [1200], [0.1 + 0.2]]).slice(1)).toBe(
+      "V\r\n1234,50\r\n10,00\r\n-3,25\r\n1200,00\r\n0,30\r\n",
+    );
   });
 
   it("formata datas ISO como dd/mm/aaaa e nulos como vazio", () => {
