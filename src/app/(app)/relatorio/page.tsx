@@ -64,6 +64,7 @@ export default async function RelatorioPage({ searchParams }: PageProps<"/relato
             <button className="botao-secundario py-1">Ver</button>
           </form>
           <Link href={`/relatorio?mes=${mesParaTexto(deslocarMes(mes, 1))}`} className="botao-secundario py-1">Próximo →</Link>
+          <Link href={`/relatorio/execucao?mes=${mesParaTexto(mes)}`} className="botao-secundario py-1" data-testid="link-relatorio-execucao">Relatório de execução</Link>
           <a href={`/relatorio/vendas.csv?mes=${mesParaTexto(mes)}`} className="botao py-1" data-testid="exportar-csv" download>Exportar CSV</a>
         </nav>
       </div>

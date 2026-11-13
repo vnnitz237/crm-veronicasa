@@ -5,7 +5,9 @@ import { criarClienteSupabase } from "@/lib/supabase/server";
 import { ehUuid, hojeISO } from "@/lib/validacao";
 import { formatarData, formatarMoeda, ROTULO_STATUS } from "@/lib/formato";
 import { StatusBadge } from "@/components/status";
+import { ROTULO_SITUACAO_EXECUCAO, situacaoExecucao } from "@/lib/relatorio-execucao";
 import { ResultadoForm } from "./resultado-form";
+import { ExecucaoForm } from "./execucao-form";
 
 const ROTULO_CAMPO: Record<string, string> = {
   criada: "Negociação criada",
@@ -17,10 +19,14 @@ const ROTULO_CAMPO: Record<string, string> = {
   data_perda: "Data da recusa",
   motivo_perda: "Motivo",
   data_execucao_prevista: "Execução prevista",
+  status_execucao: "Situação da execução",
+  data_execucao_realizada: "Execução realizada em",
+  motivo_cancelamento_execucao: "Motivo do cancelamento da execução",
 };
 
 function descreverValor(campo: string, valor: string | null) {
   if (valor === null) return "—";
+  if (campo === "status_execucao") return ROTULO_SITUACAO_EXECUCAO[valor as keyof typeof ROTULO_SITUACAO_EXECUCAO] ?? valor;
   if (campo === "status" || campo === "criada") return ROTULO_STATUS[valor as keyof typeof ROTULO_STATUS] ?? valor;
   if (campo.startsWith("data_")) return formatarData(valor);
   if (campo === "valor") return formatarMoeda(Number(valor));
@@ -45,6 +51,8 @@ export default async function NegociacaoPage({ params }: PageProps<"/negociacoes
     .order("id", { ascending: false });
 
   const podeEditar = usuario.perfil === "vendedor" && n.vendedor_id === usuario.id;
+  const hoje = hojeISO();
+  const situacao = situacaoExecucao(n, hoje);
 
   return (
     <div className="space-y-6">
@@ -80,8 +88,35 @@ export default async function NegociacaoPage({ params }: PageProps<"/negociacoes
           dataPerda={n.data_perda}
           motivoPerda={n.motivo_perda}
           dataExecucaoPrevista={n.data_execucao_prevista}
-          hoje={hojeISO()}
+          hoje={hoje}
         />
+      )}
+
+      {n.status === "fechou" && (
+        <section className="space-y-2" data-testid="execucao">
+          <h2 className="font-semibold">Execução</h2>
+          <dl className="cartao grid gap-3 sm:grid-cols-3 text-sm">
+            <div>
+              <dt className="text-suave">Situação</dt>
+              <dd data-testid="execucao-status" data-status={situacao ?? ""}>{situacao ? ROTULO_SITUACAO_EXECUCAO[situacao] : "—"}</dd>
+            </div>
+            <div><dt className="text-suave">Prevista</dt><dd data-testid="execucao-prevista">{formatarData(n.data_execucao_prevista)}</dd></div>
+            <div><dt className="text-suave">Realizada</dt><dd data-testid="execucao-realizada">{formatarData(n.data_execucao_realizada)}</dd></div>
+            {n.status_execucao === "cancelada" && (
+              <div className="sm:col-span-3"><dt className="text-suave">Motivo do cancelamento</dt><dd>{n.motivo_cancelamento_execucao}</dd></div>
+            )}
+          </dl>
+          {podeEditar && n.status_execucao && (
+            <ExecucaoForm
+              id={n.id}
+              status={n.status_execucao}
+              dataPrevista={n.data_execucao_prevista}
+              dataRealizada={n.data_execucao_realizada}
+              motivoCancelamento={n.motivo_cancelamento_execucao}
+              hoje={hoje}
+            />
+          )}
+        </section>
       )}
 
       <section className="space-y-2">
