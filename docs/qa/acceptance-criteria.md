@@ -1,5 +1,7 @@
 # Critérios de aceite — CRM Verônica Sá
 
+> **Situação final (13/11/2026):** todos os critérios abaixo foram verificados; o resultado por critério, com evidência, está em `docs/qa/relatorio-qa.md`. A legenda 🆕 indica o que era novo no momento do planejamento.
+
 Todos os critérios são verificáveis por teste automatizado no Supabase local, com dados fictícios. Datas no fuso de São Paulo.
 Legenda: ✅ coberto e passando (13/11/2026) · 🆕 novo, a implementar · *provisório* = regra H-E/H-A/H-C aprovada provisoriamente.
 

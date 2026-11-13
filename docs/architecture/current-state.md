@@ -1,5 +1,7 @@
 # Estado atual — CRM Verônica Sá
 
+> **Atualização de 13/11/2026 — MVP concluído** na branch `vnnitz237/crm-veronica-planejamento` (`1820ef7` e seguintes), com M0–M6 implementados, integrados e aprovados no QA independente (`docs/qa/relatorio-qa.md`). Gates finais: typecheck, lint e build ok; unit 38/38; banco 59/59; e2e 42/42. As seções abaixo registram a **auditoria inicial** (antes da conclusão) e ficam como histórico.
+
 Auditoria de 13/11/2026 sobre o commit `a262681` ("Consolida MVP do CRM Verônica Sá (Etapa 1)"), branch `vnnitz237/crm-veronica-planejamento`. Todos os dados são fictícios, e o Supabase é apenas local.
 
 ## 1. Repositório e ambiente
