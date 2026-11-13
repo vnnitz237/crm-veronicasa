@@ -30,6 +30,11 @@ export async function proxy(request: NextRequest) {
   const logado = Boolean(data?.claims?.sub);
   const emLogin = request.nextUrl.pathname.startsWith("/login");
 
+  // Downloads (*.csv) não redirecionam: sem sessão, 401 sem dados.
+  if (!logado && request.nextUrl.pathname.endsWith(".csv")) {
+    return new NextResponse("Não autenticado.", { status: 401 });
+  }
+
   if (!logado && !emLogin) {
     const destino = request.nextUrl.clone();
     destino.pathname = "/login";
