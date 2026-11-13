@@ -48,7 +48,8 @@ test("AC-M2-2: ação planejada para amanhã aparece em Próximas ações e na l
   await expect(page.getByTestId("proximas-acoes")).toContainText("Visita QA amanhã");
   await expect(page.getByTestId("proximas-acoes")).toContainText(br(amanha));
   await page.goto(`/acoes?mes=${mesDe(amanha)}`);
-  await expect(page.getByTestId("lista-acoes").getByRole("row", { name: new RegExp(nome) })).toContainText("Planejada");
+  const linhaPlan = page.getByTestId("lista-acoes").getByRole("row", { name: new RegExp(nome) });
+  await expect(linhaPlan.getByTestId("acao-situacao")).toHaveText("Planejada");
 });
 
 test("AC-M2-3: sem data, ou ligada a negociação de outro cliente, é recusada", async ({ page }) => {
@@ -94,6 +95,7 @@ test("AC-M2-4: cancelar muda a situação; não há exclusão", async ({ page })
   await f.getByLabel("Motivo do cancelamento *").fill("Cliente pediu para remarcar (QA)");
   await f.getByRole("button", { name: "Salvar ação" }).click();
   await expect(page.getByTestId("acao-titulo")).toContainText("Cancelada");
+  await expect(page.getByTestId("acao-situacao")).toHaveText("Cancelada"); // regressão D2-03
   await expect(page.getByTestId("acao-detalhe")).toContainText("Cliente pediu para remarcar (QA)");
   await expect(page.getByRole("button", { name: /Excluir|Apagar/i })).toHaveCount(0);
 

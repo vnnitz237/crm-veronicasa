@@ -68,7 +68,8 @@ test("AC-M3-1/2: conversa colada aparece na ficha; correção cria versão nova 
   });
   expect(dup.error).not.toBeNull();
   const { data } = await clienteAdmin().from("conversas").select("conteudo").eq("id", v1).single();
-  expect(data!.conteudo.replace(/\r\n/g, "\n")).toBe(texto);
+  expect(data!.conteudo).toBe(texto); // regressão D2-05: gravado com \n, sem \r
+  expect(data!.conteudo).not.toContain("\r");
 });
 
 test("AC-M3-3: Rafael não lê a conversa da Paula, nem por URL direta", async ({ page }) => {

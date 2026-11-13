@@ -8,6 +8,7 @@ const TELAS: [Quem, string][] = [
   ["veronica", "/relatorio?mes=2026-10"],
   ["veronica", "/relatorio/execucao?mes=2026-11"],
   ["veronica", "/acoes?mes=2026-11"],
+  ["veronica", "/acoes/e1000000-0000-4000-8000-000000000001"],
   ["veronica", "/conversas"],
   ["veronica", "/conversas/f1000000-0000-4000-8000-000000000002"],
   ["paula", "/clientes"],
@@ -20,8 +21,6 @@ const TELAS: [Quem, string][] = [
 
 for (const largura of [390, 1280]) {
   test(`QA-4: sem rolagem horizontal em ${largura}px`, async ({ page }) => {
-    // DEFEITO D2-02 (P2): em 390 px /painel, /relatorio e /acoes rolam na horizontal (cabeçalho com navegação de mês).
-    test.fail(largura === 390, "Conhecido: D2-02 — rolagem horizontal em 390 px.");
     await page.setViewportSize({ width: largura, height: 900 });
     const falhas: string[] = [];
     let atual: Quem | null = null;
