@@ -44,3 +44,7 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /blob-report/
+
+# ambientes isolados por worktree (M0)
+/.local/
+/.crm-slot

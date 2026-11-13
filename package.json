@@ -8,16 +8,17 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "db:start": "supabase start -x studio,imgproxy,mailpit,realtime,storage-api,edge-runtime,logflare,vector,supavisor,postgres-meta",
-    "db:stop": "supabase stop",
-    "db:reset": "supabase db reset",
-    "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
+    "db:start": "node scripts/supabase.mjs start -x studio,imgproxy,mailpit,realtime,storage-api,edge-runtime,logflare,vector,supavisor,postgres-meta",
+    "db:stop": "node scripts/supabase.mjs stop",
+    "db:reset": "node scripts/supabase.mjs db reset",
+    "db:types": "node scripts/supabase.mjs gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
     "env:local": "node scripts/gerar-env.mjs",
     "setup": "npm run db:start && npm run env:local",
     "test:unit": "vitest run tests/unit",
     "test:db": "vitest run tests/integracao",
     "test:e2e": "playwright test",
-    "test": "npm run db:reset && npm run test:unit && npm run test:db && npm run test:e2e"
+    "test": "npm run db:reset && npm run test:unit && npm run test:db && npm run test:e2e",
+    "ambiente:isolado": "node scripts/ambiente-isolado.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
