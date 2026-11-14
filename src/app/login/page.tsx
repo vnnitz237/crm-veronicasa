@@ -2,7 +2,7 @@ import { LoginForm } from "./login-form";
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const { erro } = await searchParams;
-  const mensagem = erro === "sem-perfil" ? "Seu usuário não tem perfil ativo. Fale com a gestão." : undefined;
+  const mensagem = erro === "acesso-desativado" ? "Acesso desativado. Fale com a gestão." : undefined;
 
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-12">

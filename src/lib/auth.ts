@@ -26,8 +26,7 @@ export const obterUsuarioAtual = cache(async (): Promise<UsuarioAtual> => {
 
   // Usuário sem perfil ativo não acessa nada.
   if (!perfil || !perfil.ativo) {
-    await supabase.auth.signOut();
-    redirect("/login?erro=sem-perfil");
+    redirect("/login?erro=acesso-desativado");
   }
 
   return { id: perfil.id, nome: perfil.nome, perfil: perfil.perfil };

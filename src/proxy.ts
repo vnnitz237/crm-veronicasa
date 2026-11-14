@@ -2,6 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { supabaseEnv } from "@/lib/supabase/env";
 
+function redirecionarComCookies(request: NextRequest, response: NextResponse, caminho: string) {
+  const destino = new URL(caminho, request.url);
+  const redirecionamento = NextResponse.redirect(destino);
+  response.cookies.getAll().forEach((cookie) => redirecionamento.cookies.set(cookie));
+  return redirecionamento;
+}
+
 /**
  * Renova a sessão do Supabase a cada requisição e manda quem não está logado
  * para /login. A autorização dos dados continua no banco (RLS).
@@ -27,7 +34,8 @@ export async function proxy(request: NextRequest) {
   });
 
   const { data } = await supabase.auth.getClaims();
-  const logado = Boolean(data?.claims?.sub);
+  const usuarioId = data?.claims?.sub;
+  const logado = Boolean(usuarioId);
   const emLogin = request.nextUrl.pathname.startsWith("/login");
 
   // Downloads (*.csv) não redirecionam: sem sessão, 401 sem dados.
@@ -36,10 +44,28 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!logado && !emLogin) {
-    const destino = request.nextUrl.clone();
-    destino.pathname = "/login";
-    destino.search = "";
-    return NextResponse.redirect(destino);
+    return redirecionarComCookies(request, response, "/login");
+  }
+
+  if (usuarioId) {
+    const { data: perfilAtivo } = await supabase
+      .from("perfis")
+      .select("id")
+      .eq("id", usuarioId)
+      .eq("ativo", true)
+      .maybeSingle();
+
+    if (!perfilAtivo) {
+      await supabase.auth.signOut();
+      if (request.nextUrl.pathname.endsWith(".csv")) {
+        const naoAutenticado = new NextResponse("Não autenticado.", { status: 401 });
+        response.cookies.getAll().forEach((cookie) => naoAutenticado.cookies.set(cookie));
+        return naoAutenticado;
+      }
+      if (!emLogin) {
+        return redirecionarComCookies(request, response, "/login?erro=acesso-desativado");
+      }
+    }
   }
 
   return response;
