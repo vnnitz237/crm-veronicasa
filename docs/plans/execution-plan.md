@@ -16,7 +16,7 @@ Situação: **aprovado com condições em 13/11/2026**. Escopo e contratos: `doc
 
 **P2 — posterior**
 - M7 configurações · paginação e filtros extras · melhorias visuais · M8 telefones em revisão (decisão 3);
-- D-01 sessão de perfil inativo (fica em P2 enquanto não houver risco de acesso; o QA reavalia).
+- D-01 sessão de perfil inativo — resolvido após o MVP em `9440683`.
 
 ## 2. Caminho crítico
 

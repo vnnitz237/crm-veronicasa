@@ -3,6 +3,8 @@
 Data: 13/11/2026 · branch `crm/d-qa` na integração `435e7bf` (correções W3) · slot 4 · dados fictícios do seed.
 **Execução final (D3):** `npm test` (db:reset + unit 38/38 + banco 59/59 + e2e 42/42, **sem nenhum `test.fail`**). Saída: EXIT 0.
 
+> **Pós-D3 (14/11/2026):** D-01 foi resolvido e integrado em `9440683`. A suíte completa na branch integrada terminou com typecheck, lint e build verdes; unit 38/38, banco 59/59 e e2e 46/46 (incluindo 4 novos testes de perfil inativo), EXIT 0.
+
 Legenda: **PASSOU** · **FALHOU** · **BLOQUEADO** (não verificável nesta tarefa).
 
 ## 1. Regressão (AC-01 a AC-11)
@@ -97,11 +99,12 @@ Regressão D2-03: `acao-situacao` verificado no detalhe ("Cancelada", AC-M2-4) e
 
 Nenhum defeito novo encontrado no D3. Observação sem defeito: `normalizar_telefone` executável por anon (ver QA-2).
 
-## 11. Reavaliação do D-01 (sessão de perfil inativo)
-- O Auth **continua emitindo sessão** para um perfil com `ativo = false` (login com senha funciona).
-- Com essa sessão, a RLS bloqueia tudo: `perfil_atual()` devolve nulo para inativos, e todas as políticas dependem dele. Testado: leitura vazia em `clientes`, `negociacoes`, `historico_*`, `acoes_venda`, `conversas`, `analises_conversa`, `conflitos_telefone`, nas três visões e nas três RPCs; UPDATE sem efeito; INSERT recusado em clientes, ações e conversas. Unidades e serviços também vêm vazios.
-- Único dado visível: a **própria linha** em `perfis` (política `id = auth.uid()`), sem dados comerciais.
-- **Conclusão:** não há risco de acesso a dados; o D-01 continua **P2** (experiência: o usuário inativo entra e vê telas vazias/erro em vez de uma mensagem clara). Recomenda-se, quando oportuno, bloquear na aplicação (`obterUsuarioAtual`) com mensagem de "acesso desativado".
+## 11. D-01 — sessão de perfil inativo
+- **Resolvido em `9440683`:** a Server Action de login valida o perfil ativo e encerra sessões rejeitadas; o proxy revoga imediatamente uma sessão existente quando o perfil é desativado.
+- O usuário termina em `/login` com a mensagem "Acesso desativado. Fale com a gestão.", sem loop de redirecionamento.
+- Downloads CSV continuam respondendo 401 sem sessão. Usuários ativos continuam entrando normalmente.
+- A RLS permanece como segunda camada e continua bloqueando todos os dados para perfis inativos.
+- Evidência: `tests/e2e/perfil-inativo.spec.ts`, 4/4; suíte integrada 38 unitários + 59 de banco + 46 e2e.
 
 ## 12. Critérios para a demonstração
 | # | Critério | Situação |
@@ -110,4 +113,4 @@ Nenhum defeito novo encontrado no D3. Observação sem defeito: `normalizar_tele
 | 2 | Todos os critérios ✅ e 🆕 aprovados passam | PASSOU — AC-01..11, AC-M1..M6, QA-1..6 e QA-M0-1 passam; QA-M0-2 (simultaneidade) e QA-M0-3 não reexecutados por mim |
 | 3 | README lista o provisório e as decisões abertas | Não avaliado pelo QA (documento do coordenador) |
 
-**Veredito:** **APTO para a demonstração**, do ponto de vista de QA. Não há defeito aberto, de P0 a P2. O D-01 continua P2 e não dá acesso a dados.
+**Veredito:** **APTO para a demonstração**, do ponto de vista de QA. Não há defeito aberto de P0 a P2; o D-01 foi resolvido após o D3 e validado novamente na suíte integrada.

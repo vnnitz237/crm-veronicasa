@@ -1,6 +1,6 @@
 # Estado atual — CRM Verônica Sá
 
-> **Atualização de 13/11/2026 — MVP concluído** na branch `vnnitz237/crm-veronica-planejamento` (`1820ef7` e seguintes), com M0–M6 implementados, integrados e aprovados no QA independente (`docs/qa/relatorio-qa.md`). Gates finais: typecheck, lint e build ok; unit 38/38; banco 59/59; e2e 42/42. As seções abaixo registram a **auditoria inicial** (antes da conclusão) e ficam como histórico.
+> **Atualização de 14/11/2026 — versão de demonstração certificada** na branch `vnnitz237/crm-veronica-planejamento` (`9440683` e seguintes), com M0–M6 e a rejeição de perfis inativos integrados. Gates: typecheck, lint e build ok; unit 38/38; banco 59/59; e2e 46/46. As seções abaixo registram a **auditoria inicial** (antes da conclusão) e ficam como histórico.
 
 Auditoria de 13/11/2026 sobre o commit `a262681` ("Consolida MVP do CRM Verônica Sá (Etapa 1)"), branch `vnnitz237/crm-veronica-planejamento`. Todos os dados são fictícios, e o Supabase é apenas local.
 
@@ -102,7 +102,7 @@ Navegador ──► Next.js (proxy.ts: renova a sessão e manda quem não está 
 | R-01 | **P0 para o paralelismo** | Um único Supabase local, com portas fixas, e `npm test` executa `db reset`. Agentes em paralelo destruiriam o banco uns dos outros. A porta do e2e (3100) também é fixa | `supabase/config.toml`, `playwright.config.ts:6`, `package.json` (`test`) |
 | R-02 | **P0 para o escopo** | As etapas 2, 3 e 4 dependem das decisões 11, 12 e 13, ainda sem confirmação da cliente | README, "Decisões pendentes" |
 | R-03 | P1 para a integração | `main` não contém o MVP. A integração precisa acontecer na branch de trabalho até haver aprovação | `git worktree list` |
-| D-01 | P2 | Perfil inativo: o acesso é bloqueado corretamente, mas o cookie de sessão não é apagado (o `signOut` roda num Server Component) e a mensagem some na visita seguinte | `src/lib/auth.ts:29`; teste manual em 13/11 |
+| D-01 | **Resolvido em `9440683`** | O login rejeita o perfil inativo, encerra a sessão e mostra mensagem clara; o proxy também revoga sessões existentes sem alterar o 401 dos CSVs | `tests/e2e/perfil-inativo.spec.ts` (4/4) |
 | D-02 | P2 | 7 vulnerabilidades moderadas em dependências de desenvolvimento (ESLint/minimatch) | `npm audit` |
 | D-03 | P2 | Listas sem paginação (clientes e negociações) | `clientes/page.tsx`, `negociacoes/page.tsx` |
 | R-04 | Risco | 8 GB de RAM limitam o paralelismo real: cada agente com servidor Next, Playwright e Supabase consome cerca de 1 a 1,5 GB | `sysctl`, `docker stats` |

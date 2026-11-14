@@ -23,7 +23,7 @@ Regras gerais mantidas:
 | M6 Painel gerencial mínimo | P1 |
 | Integração, testes e roteiro de demonstração | P1 |
 | M7 Configurações (serviços e unidades), paginação, filtros adicionais, melhorias visuais, M8 telefones em revisão (decisão 3) | P2 |
-| D-01 Sessão de perfil inativo | P2 (reavaliar se o QA encontrar risco de acesso) |
+| D-01 Sessão de perfil inativo | **Resolvido após o MVP em `9440683`** |
 
 ## 2. Contratos
 

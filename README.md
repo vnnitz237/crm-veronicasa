@@ -60,7 +60,7 @@ Comece com `npm run db:reset`. As datas dos dados fictícios estão em outubro e
 **1. Vendedora — Paula**
 1. Entre como `paula@exemplo.test`. Em **Clientes** ela vê só os próprios (Marcos e Beatriz).
 2. **Novo cliente** → "Fernanda Rocha", telefone `(11) 98888-0001`, origem Instagram → **Salvar**. Na ficha → **Editar** → acrescente uma observação e salve.
-3. **Nova negociação** → *Consultoria Inicial*, *Unidade Sul*, `650,00` → **Registrar resultado** → **Fechou**, venda em `31/10/2026`, execução prevista para `12/11/2026`. A seção **Execução** aparece como *pendente*.
+3. **Nova negociação** → *Consultoria Inicial*, *Unidade Sul*, `650,00` → **Registrar resultado** → **Fechou**, venda em `31/10/2026`, execução prevista para `12/11/2026`. Como essa previsão já passou, a seção **Execução** aparece como *Atrasada* (continua sendo uma execução pendente).
 4. **Clientes → Marcos Teixeira:** a ficha mostra as duas negociações (uma fechada, uma não fechada), as **próximas ações** (acompanhamento em 18/11) e as **conversas** (a de 27/10 aparece já corrigida).
 5. Abra a negociação *Pacote Mensal* do Marcos → **Execução → Realizada em 04/11/2026**. O histórico registra a mudança.
 6. Na ficha do Marcos → **Nova ação** → ligação, *realizada*, hoje, com descrição. Depois **Registrar conversa** → WhatsApp, data e texto.
@@ -79,7 +79,7 @@ Comece com `npm run db:reset`. As datas dos dados fictícios estão em outubro e
    - ações: 3 planejadas, 1 realizada, 1 cancelada;
    - 1 conversa.
 
-   Os passos da Paula alteram esses números: a execução do Marcos passa a *realizada*, a da Fernanda (12/11) entra como pendente, e a ação e a conversa novas entram nas contagens.
+   Os passos da Paula alteram esses números: a execução do Marcos passa a *realizada*, a da Fernanda (12/11) entra como pendente atrasada, e a ação e a conversa novas entram nas contagens.
 3. **Vendas → outubro:** as vendas da Paula e do Rafael, com o total por vendedor. A venda do Marcos (fechada em 28/10, executada em 04/11) está em **outubro** em Vendas e em **novembro** em Execução.
 4. **Conversas:** filtre por vendedor e canal, abra uma conversa da Paula → **Registrar análise**. Entre de novo como Paula: ela **não vê** a análise.
 5. Abra qualquer negociação, ação ou conversa: a gestora consulta tudo, mas não há formulário de edição.
@@ -161,4 +161,4 @@ A implementação usa só migrações aditivas e enums ampliáveis, então ajust
 
 ## Fora do MVP (P2)
 
-Configurações pela tela (serviços, unidades, usuários), paginação e filtros extras, resolução de telefones em revisão (decisão 3), melhorias visuais, logout automático do perfil inativo (o acesso já está bloqueado; ver o QA) e deploy remoto.
+Configurações pela tela (serviços, unidades, usuários), paginação e filtros extras, resolução de telefones em revisão (decisão 3), melhorias visuais e deploy remoto.
